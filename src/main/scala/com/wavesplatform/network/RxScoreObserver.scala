@@ -78,10 +78,17 @@ object RxScoreObserver extends ScorexLogging {
     // Make a stream of unique scores in each channel
     def rs: Observable[Option[Channel]] = remoteScores
       .observeOn(scheduler)
+      .dump("[CUT] rs1")
       .groupBy(_._1)
-      .map(_.distinctUntilChanged)
-      .debounce(remoteScoreDebounce)
+      .map(_
+        .dump("[CUT] rs2")
+        .distinctUntilChanged
+        .dump("[CUT] rs3")
+        .debounce(remoteScoreDebounce)
+      )
+      .dump("[CUT] rs4")
       .merge
+      .dump("[CUT] rs5")
       .map { case ((ch, score)) =>
         scores.put(ch, score)
         log.trace(s"${id(ch)} New remote score $score")
